@@ -3,7 +3,10 @@ const User = require('../models/user');
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Внутренняя ошибка сервера' }));
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
 
 module.exports.getUserById = (req, res) => {
@@ -26,7 +29,6 @@ module.exports.getUserById = (req, res) => {
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  console.log(req.body);
 
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))

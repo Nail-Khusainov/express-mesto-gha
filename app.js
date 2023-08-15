@@ -8,13 +8,20 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-mongoose
-  .connect('mongodb://localhost:27017/mestodb')
-  .catch((error) => console.log(error.message));
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error.message);
+  });
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '',
+    _id: '64db626afb808ab924875ba2',
   };
 
   next();

@@ -2,8 +2,11 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Внутренняя ошибка сервера' }));
+    .then((cards) => res.status(200).send({ data: cards }))
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
 
 module.exports.createCard = (req, res) => {
