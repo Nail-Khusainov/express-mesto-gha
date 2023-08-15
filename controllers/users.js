@@ -61,7 +61,7 @@ module.exports.updateProfile = (req, res) => {
       }
     })
     .catch((error) => {
-      if (error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверный Id' });
       } else {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
@@ -89,7 +89,7 @@ module.exports.updateAvatar = (req, res) => {
       }
     })
     .catch((error) => {
-      if (error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверный Id' });
       } else {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
