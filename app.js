@@ -1,6 +1,8 @@
 const express = require('express');
-// Слушаем 3000 порт
 const mongoose = require('mongoose');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const { NOTFOUND_ERROR } = require('./utils/utils');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -19,6 +21,16 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
     console.error('Error connecting to MongoDB:', error.message);
   });
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 88,
+  message: 'Превышено ограничение запросов c вашего IP, пожалуйста, повторите позже.',
+});
+
+app.use(limiter);
+
+app.use(helmet());
+
 app.use((req, res, next) => {
   req.user = {
     _id: '64db626afb808ab924875ba2',
@@ -31,7 +43,7 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.all('*', (req, res) => {
-  res.status(404).send({ message: 'Not found' });
+  res.status(NOTFOUND_ERROR).send({ message: 'Not found' });
 });
 
 app.listen(PORT, () => {
