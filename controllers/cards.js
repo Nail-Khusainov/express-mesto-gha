@@ -1,5 +1,4 @@
 const Card = require('../models/card');
-// const { VALIDATION_ERROR, NOTFOUND_ERROR, SERVER_ERROR } = require('../utils/utils');
 const NotFoundError = require('../errors/NotFound');
 const ForbiddenError = require('../errors/Forbidden');
 
@@ -31,13 +30,6 @@ module.exports.deleteCard = (req, res, next) => {
         .then(res.send({ data: card }));
     })
     .catch(next);
-  // .catch((error) => {
-  //   if (error.name === 'CastError') {
-  //     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-  //   } else {
-  //     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-  //   }
-  // });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -54,13 +46,6 @@ module.exports.likeCard = (req, res, next) => {
   })
     .catch(next);
 };
-// .catch((error) => {
-//   if (error.name === 'CastError') {
-//     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-//   } else {
-//     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-//   }
-// });
 
 module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
@@ -75,10 +60,3 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
     }
   })
   .catch(next);
-// .catch((error) => {
-//   if (error.name === 'CastError') {
-//     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-//   } else {
-//     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-//   }
-// });

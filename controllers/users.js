@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-// const { VALIDATION_ERROR, NOTFOUND_ERROR, SERVER_ERROR } = require('../utils/utils');
 const NotFoundError = require('../errors/NotFound');
 const UnauthorizedError = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequest');
@@ -105,13 +104,6 @@ module.exports.updateProfile = (req, res, next) => {
       }
     })
     .catch(next);
-// .catch((error) => {
-//   if (error.name === 'ValidationError') {
-//     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-//   } else {
-//     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-//   }
-// });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -134,11 +126,4 @@ module.exports.updateAvatar = (req, res, next) => {
       }
     })
     .catch(next);
-// .catch((error) => {
-//   if (error.name === 'ValidationError') {
-//     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-//   } else {
-//     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-//   }
-// });
 };

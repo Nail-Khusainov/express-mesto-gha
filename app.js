@@ -40,14 +40,6 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(helmet());
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '64db626afb808ab924875ba2',
-//   };
-
-//   next();
-// });
-
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
