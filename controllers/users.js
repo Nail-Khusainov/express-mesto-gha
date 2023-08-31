@@ -73,7 +73,10 @@ module.exports.createUser = (req, res, next) => {
       about,
       avatar,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      const { password: _password, ...rest } = user;
+      res.send({ data: rest });
+    })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError('Введен некорректный тип данных'));

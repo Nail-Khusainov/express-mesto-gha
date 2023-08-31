@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const regExLink = require('../utils/utils');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,7 +14,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return /^(https?:\/\/)?(www\.)?[\w\-./?#[\]@!$&'()*+,;=]+$/.test(v);
+        return regExLink.test(v);
       },
       message: 'Неверный формат ссылки',
     },

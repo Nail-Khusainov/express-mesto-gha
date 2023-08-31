@@ -1,6 +1,4 @@
 /* eslint-disable linebreak-style */
-const VALIDATION_ERROR = 400;
-const NOTFOUND_ERROR = 404;
-const SERVER_ERROR = 500;
+const regExLink = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=-]+(#)?$/;
 
-module.exports = { VALIDATION_ERROR, NOTFOUND_ERROR, SERVER_ERROR };
+module.exports = regExLink;

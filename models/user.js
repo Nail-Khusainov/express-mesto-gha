@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const regExLink = require('../utils/utils');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -23,7 +24,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator(v) {
-        return /^(https?:\/\/)?(www\.)?[\w\-./?#[\]@!$&'()*+,;=]+$/.test(v);
+        return regExLink.test(v);
       },
       message: 'Неверный формат ссылки',
     },
