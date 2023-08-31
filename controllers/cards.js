@@ -1,84 +1,84 @@
 const Card = require('../models/card');
-const { VALIDATION_ERROR, NOTFOUND_ERROR, SERVER_ERROR } = require('../utils/utils');
+// const { VALIDATION_ERROR, NOTFOUND_ERROR, SERVER_ERROR } = require('../utils/utils');
+const NotFoundError = require('../errors/NotFound');
+const ForbiddenError = require('../errors/Forbidden');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((error) => {
-      console.error(error);
-      res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const owner = req.user._id;
   const { name, link } = req.body;
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
-        res.status(VALIDATION_ERROR).send({ message: 'Некорректный запрос' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(NOTFOUND_ERROR).send({ message: 'Карточка не существует' });
-      } else {
-        res.send({ data: card });
+        throw new NotFoundError('Карточка не существует');
       }
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Вы не можете удалять карточки других пользователей');
+      }
+      return Card.findByIdAndRemove(req.params.cardId)
+        .then(res.send({ data: card }));
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-      }
-    });
+    .catch(next);
+  // .catch((error) => {
+  //   if (error.name === 'CastError') {
+  //     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
+  //   } else {
+  //     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
+  //   }
+  // });
 };
 
-module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
-  req.params.cardId,
-  { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-  { new: true },
-)
-  .then((card) => {
+module.exports.likeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  ).then((card) => {
     if (!card) {
-      res.status(NOTFOUND_ERROR).send({ message: 'Карточка не существует' });
+      throw new NotFoundError('Карточка не существует');
     } else {
       res.send({ data: card });
     }
   })
-  .catch((error) => {
-    if (error.name === 'CastError') {
-      res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-    } else {
-      res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-    }
-  });
+    .catch(next);
+};
+// .catch((error) => {
+//   if (error.name === 'CastError') {
+//     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
+//   } else {
+//     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
+//   }
+// });
 
-module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
+module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $pull: { likes: req.user._id } }, // убрать _id из массива
   { new: true },
 )
   .then((card) => {
     if (!card) {
-      res.status(NOTFOUND_ERROR).send({ message: 'Карточка не существует' });
+      throw new NotFoundError('Карточка не существует');
     } else {
       res.send({ data: card });
     }
   })
-  .catch((error) => {
-    if (error.name === 'CastError') {
-      res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
-    } else {
-      res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
-    }
-  });
+  .catch(next);
+// .catch((error) => {
+//   if (error.name === 'CastError') {
+//     res.status(VALIDATION_ERROR).send({ message: 'Неверный Id' });
+//   } else {
+//     res.status(SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
+//   }
+// });

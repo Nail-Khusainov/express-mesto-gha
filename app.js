@@ -1,14 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { celebrate, Joi, errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const { NOTFOUND_ERROR } = require('./utils/utils');
+const errorHandler = require('./middlewares/errorHandler');
+const NotFoundError = require('./errors/NotFound');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
@@ -28,23 +34,41 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-
 app.use(helmet());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64db626afb808ab924875ba2',
-  };
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: '64db626afb808ab924875ba2',
+//   };
 
-  next();
-});
+//   next();
+// });
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(4),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(/^(https?:\/\/)?(www\.)?[\w\-./?#[\]@!$&'()*+,;=]+$/),
+  }),
+}), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(4),
+  }),
+}), login);
+
+app.use(auth);
+app.use(errors());
+app.use(errorHandler);
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.all('*', (req, res) => {
-  res.status(NOTFOUND_ERROR).send({ message: 'Not found' });
-});
+app.all('*', () => { throw new NotFoundError('Not found'); });
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
