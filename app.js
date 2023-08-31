@@ -70,10 +70,9 @@ app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
+app.all('*', () => { throw new NotFoundError('Not found'); });
 app.use(errors());
 app.use(errorHandler);
-
-app.all('*', () => { throw new NotFoundError('Not found'); });
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
