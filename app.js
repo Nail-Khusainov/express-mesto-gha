@@ -63,11 +63,12 @@ app.post('/signin', celebrate({
 }), login);
 
 app.use(auth);
-app.use(errors());
-app.use(errorHandler);
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+
+app.use(errors());
+app.use(errorHandler);
 
 app.all('*', () => { throw new NotFoundError('Not found'); });
 
