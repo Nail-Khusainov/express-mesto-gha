@@ -8,6 +8,7 @@ const {
   updateProfile,
   updateAvatar,
   getCurrentUser,
+  signOut,
 } = require('../controllers/users');
 
 router.get('/', getUsers);
@@ -34,5 +35,7 @@ router.patch('/me/avatar', celebrate({
     avatar: Joi.string().pattern(regExLink),
   }),
 }), updateAvatar);
+
+router.delete('/signout', signOut);
 
 module.exports = router;
